@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A classic Tetris game built with pure HTML, CSS, and JavaScript."
+    />
+    <meta
+      name="keywords"
+      content="Tetris, HTML5, JavaScript Game, Canvas API"
+    />
+    <meta name="author" content="Nur Cholis Majid" />
+    <meta name="theme-color" content="#000000" />
+    <meta property="og:title" content="Tetris" />
+    <meta property="og:type" content="game" />
+    <meta property="og:image" content="/src/assets/tetris-favicon.jpg" />
+    <meta
+      property="og:description"
+      content="Play the classic Tetris game made with HTML, CSS, and Vanilla JavaScript."
+    />
+    <link
+      rel="shortcut icon"
+      href="/src/assets/tetris-favicon.jpg"
+      type="image/jpeg"
+    />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/src/css/style.css" />
+    <title>Tetris</title>
+  </head>
+  <body>
+    <div id="root">
+      <h1>Cholis's Tetris</h1>
+    </div>
+    <div class="overlay" id="overlay">
+      <h1>Welcome to Cholis Gaming</h1>
+      <h1>Press Play to Start</h1>
+      <button onclick="startGame()">Play</button>
+    </div>
+
+    <script>
+      function startGame() {
+        const overlay = document.getElementById('overlay');
+        overlay.style.display = 'none';
+        console.log('Game Started!');
+      }
+    </script>
+    <script src="./src/js/script.js"></script>
+  </body>
+</html>

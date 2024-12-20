@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Penjualan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: large;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Dashboard Penjualan</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <input type="file" id="fileInput" accept=".csv" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <select id="yearFilter" class="form-select">
+                    <option value="">Filter Tahun</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabel Data -->
+        <div id="tableContainer">
+            <table id="table" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Tahun</th>
+                        <th colspan="12">Bulan</th>
+                    </tr>
+                    <tr>
+                        <th>Januari</th>
+                        <th>Februari</th>
+                        <th>Maret</th>
+                        <th>April</th>
+                        <th>Mei</th>
+                        <th>Juni</th>
+                        <th>Juli</th>
+                        <th>Agustus</th>
+                        <th>September</th>
+                        <th>Oktober</th>
+                        <th>November</th>
+                        <th>Desember</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div id="noDataMessage" class="no-data">
+                Tidak ada data untuk ditampilkan. Masukkan file CSV.
+            </div>
+        </div>
+
+        <div id="chartContainer" class="mt-4" style="display: none;">
+            <canvas id="chart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const yearFilter = document.getElementById('yearFilter');
+        const chartElement = document.getElementById('chart');
+        const noDataMessage = document.getElementById('noDataMessage');
+        const chartContainer = document.getElementById('chartContainer');
+        let chart;
+        let data = [];
+
+        fileInput.addEventListener('change', handleFile);
+        yearFilter.addEventListener('change', updateDashboard);
+
+        function handleFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csvData = e.target.result;
+                    parseCSV(csvData);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function parseCSV(csvData) {
+            const rows = csvData.split('\n').filter(row => row.trim() !== '');
+            if (rows.length < 2) {
+                alert('File CSV tidak valid atau kosong!');
+                return;
+            }
+
+            const headers = rows[0].split(',').map(header => header.trim());
+            if (!headers.includes('Tahun')) {
+                alert('File CSV harus memiliki kolom "Tahun"!');
+                return;
+            }
+
+            data = rows.slice(1).map(row => {
+                const values = row.split(',');
+                if (values.length !== headers.length) return null;
+                return headers.reduce((acc, header, index) => {
+                    acc[header] = values[index] ? values[index].trim() : '0';
+                    return acc;
+                }, {});
+            }).filter(row => row !== null);
+
+            if (data.length === 0) {
+                alert('Tidak ada data valid di dalam file CSV!');
+                return;
+            }
+
+            // Hide the "no data" message and show the chart container
+            noDataMessage.style.display = 'none';
+            chartContainer.style.display = 'block';
+
+            updateYearFilter();
+            updateDashboard();
+        }
+
+        function updateYearFilter() {
+            const years = [...new Set(data.map(row => row.Tahun))].sort();
+            yearFilter.innerHTML = '<option value="">Filter Tahun</option>';
+            years.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            });
+        }
+
+        function updateDashboard() {
+            updateTable();
+            updateChart();
+        }
+
+        function updateTable() {
+            const filteredYear = yearFilter.value;
+            const filteredData = filteredYear ? data.filter(row => row.Tahun === filteredYear) : data;
+
+            const tableBody = document.querySelector('#table tbody');
+            tableBody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 13;
+                cell.textContent = 'Tidak ada data untuk ditampilkan.';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+            } else {
+                filteredData.forEach(row => {
+                    const tableRow = document.createElement('tr');
+                    Object.values(row).forEach(value => {
+                        const cell = document.createElement('td');
+                        cell.textContent = value;
+                        tableRow.appendChild(cell);
+                    });
+                    tableBody.appendChild(tableRow);
+                });
+            }
+        }
+
+        function updateChart() {
+            const filteredYear = yearFilter.value;
+            const filteredData = filteredYear ? data.filter(row => row.Tahun === filteredYear) : data;
+
+            // If no data is available, destroy the chart and return
+            if (filteredData.length === 0) {
+                if (chart) chart.destroy();
+                chart = null;
+                return;
+            }
+
+            const labels = Object.keys(filteredData[0]).filter(key => key !== 'Tahun');
+            const datasets = filteredData.map(row => ({
+                label: row.Tahun,
+                data: labels.map(label => Number(row[label] || 0)),
+                backgroundColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.7)`
+            }));
+
+            if (chart) chart.destroy();
+
+            // Create a new chart with the filtered data
+            chart = new Chart(chartElement, {
+                type: 'bar',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Grafik Penjualan' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
