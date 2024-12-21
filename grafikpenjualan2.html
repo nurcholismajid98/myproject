@@ -12,11 +12,8 @@
             vertical-align: middle;
         }
 
-        .no-data {
-            text-align: center;
-            color: #888;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            font-size: large;
+        .card {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -26,9 +23,6 @@
 
         <div class="row mb-4">
             <div class="col-md-6">
-                <input type="file" id="fileInput" accept=".csv" class="form-control">
-            </div>
-            <div class="col-md-6">
                 <select id="yearFilter" class="form-select">
                     <option value="">Filter Tahun</option>
                 </select>
@@ -36,99 +30,88 @@
         </div>
 
         <!-- Tabel Data -->
-        <div id="tableContainer">
-            <table id="table" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th rowspan="2">Tahun</th>
-                        <th colspan="12">Bulan</th>
-                    </tr>
-                    <tr>
-                        <th>Januari</th>
-                        <th>Februari</th>
-                        <th>Maret</th>
-                        <th>April</th>
-                        <th>Mei</th>
-                        <th>Juni</th>
-                        <th>Juli</th>
-                        <th>Agustus</th>
-                        <th>September</th>
-                        <th>Oktober</th>
-                        <th>November</th>
-                        <th>Desember</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <div id="noDataMessage" class="no-data">
-                Tidak ada data untuk ditampilkan. Masukkan file CSV.
+        <div id="tableContainer" class="mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Data Penjualan</h5>
+                    <table id="table" class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th rowspan="2">Tahun</th>
+                                <th colspan="12">Bulan</th>
+                            </tr>
+                            <tr>
+                                <th>Januari</th>
+                                <th>Februari</th>
+                                <th>Maret</th>
+                                <th>April</th>
+                                <th>Mei</th>
+                                <th>Juni</th>
+                                <th>Juli</th>
+                                <th>Agustus</th>
+                                <th>September</th>
+                                <th>Oktober</th>
+                                <th>November</th>
+                                <th>Desember</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <div id="chartContainer" class="mt-4" style="display: none;">
-            <canvas id="chart"></canvas>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Grafik Penjualan</h5>
+                    <canvas id="chart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const fileInput = document.getElementById('fileInput');
         const yearFilter = document.getElementById('yearFilter');
         const chartElement = document.getElementById('chart');
-        const noDataMessage = document.getElementById('noDataMessage');
         const chartContainer = document.getElementById('chartContainer');
         let chart;
-        let data = [];
-
-        fileInput.addEventListener('change', handleFile);
-        yearFilter.addEventListener('change', updateDashboard);
-
-        function handleFile(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const csvData = e.target.result;
-                    parseCSV(csvData);
-                };
-                reader.readAsText(file);
+        let data = [
+            {
+                "Tahun": "2023",
+                "Januari": "100",
+                "Februari": "120",
+                "Maret": "130",
+                "April": "150",
+                "Mei": "160",
+                "Juni": "140",
+                "Juli": "180",
+                "Agustus": "170",
+                "September": "160",
+                "Oktober": "190",
+                "November": "200",
+                "Desember": "210"
+            },
+            {
+                "Tahun": "2022",
+                "Januari": "80",
+                "Februari": "95",
+                "Maret": "110",
+                "April": "130",
+                "Mei": "125",
+                "Juni": "145",
+                "Juli": "160",
+                "Agustus": "150",
+                "September": "170",
+                "Oktober": "180",
+                "November": "190",
+                "Desember": "210"
             }
-        }
+        ];
 
-        function parseCSV(csvData) {
-            const rows = csvData.split('\n').filter(row => row.trim() !== '');
-            if (rows.length < 2) {
-                alert('File CSV tidak valid atau kosong!');
-                return;
-            }
-
-            const headers = rows[0].split(',').map(header => header.trim());
-            if (!headers.includes('Tahun')) {
-                alert('File CSV harus memiliki kolom "Tahun"!');
-                return;
-            }
-
-            data = rows.slice(1).map(row => {
-                const values = row.split(',');
-                if (values.length !== headers.length) return null;
-                return headers.reduce((acc, header, index) => {
-                    acc[header] = values[index] ? values[index].trim() : '0';
-                    return acc;
-                }, {});
-            }).filter(row => row !== null);
-
-            if (data.length === 0) {
-                alert('Tidak ada data valid di dalam file CSV!');
-                return;
-            }
-
-            // Hide the "no data" message and show the chart container
-            noDataMessage.style.display = 'none';
-            chartContainer.style.display = 'block';
-
-            updateYearFilter();
-            updateDashboard();
-        }
+        updateYearFilter();
+        updateDashboard();
 
         function updateYearFilter() {
             const years = [...new Set(data.map(row => row.Tahun))].sort();
@@ -153,24 +136,15 @@
             const tableBody = document.querySelector('#table tbody');
             tableBody.innerHTML = '';
 
-            if (filteredData.length === 0) {
-                const row = document.createElement('tr');
-                const cell = document.createElement('td');
-                cell.colSpan = 13;
-                cell.textContent = 'Tidak ada data untuk ditampilkan.';
-                row.appendChild(cell);
-                tableBody.appendChild(row);
-            } else {
-                filteredData.forEach(row => {
-                    const tableRow = document.createElement('tr');
-                    Object.values(row).forEach(value => {
-                        const cell = document.createElement('td');
-                        cell.textContent = value;
-                        tableRow.appendChild(cell);
-                    });
-                    tableBody.appendChild(tableRow);
+            filteredData.forEach(row => {
+                const tableRow = document.createElement('tr');
+                Object.values(row).forEach(value => {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    tableRow.appendChild(cell);
                 });
-            }
+                tableBody.appendChild(tableRow);
+            });
         }
 
         function updateChart() {
@@ -195,8 +169,11 @@
 
             // Create a new chart with the filtered data
             chart = new Chart(chartElement, {
-                type: 'bar',
-                data: { labels, datasets },
+                type: 'bar', // ensure the chart type is 'bar'
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
                 options: {
                     responsive: true,
                     plugins: {
@@ -208,7 +185,10 @@
                     }
                 }
             });
+            chartContainer.style.display = 'block'; // Show the chart container
         }
+
+        yearFilter.addEventListener('change', updateDashboard);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
