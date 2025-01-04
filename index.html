@@ -69,6 +69,81 @@
                         </div>
                     </div>
                 </div>
+                 <div class="container text-center my-4">
+                    <button class="btn btn-outline-dark me-2" onclick="filterGallery('all')">All</button>
+                    <button class="btn btn-outline-dark me-2" onclick="filterGallery('project')">Project</button>
+                    <button class="btn btn-outline-dark" onclick="filterGallery('certificate')">Certificate</button>
+                </div>
+                <div class="container">
+                    <div class="row g-4">
+                        <div class="col-md-4 filter-item project">
+                            <div class="card project-card" onclick="openProject('calculator.html')">
+                                <iframe class="iframe-background" src="calculator.html" title="Project 1" scrolling="no" style="pointer-events: none;"></iframe>
+                            </div>
+                        </div>
+                        <!-- Project Card 2 -->
+                        <div class="col-md-4 filter-item project">
+                            <div class="card project-card" onclick="openProject('login-form.html')">
+                                <iframe class="iframe-background" src="login-form.html" title="Project 2" scrolling="no" style="pointer-events: none;"></iframe>
+                            </div>
+                        </div>
+                
+                        <!-- Project Card 3 -->
+                        <div class="col-md-4 filter-item project">
+                            <div class="card project-card" onclick="openProject('tetris.html')">
+                                <iframe class="iframe-background" src="tetris.html" title="Project 3" scrolling="no" style="pointer-events: none;"></iframe>
+                            </div>
+                        </div>
+                
+                        <!-- Project Card 4 -->
+                        <div class="col-md-4 filter-item project">
+                            <div class="card project-card" onclick="openProject('grafikpenjualan2.html')">
+                                <iframe class="iframe-background" src="grafikpenjualan2.html" title="Project 4" scrolling="no" style="pointer-events: none;"></iframe>
+                            </div>
+                        </div>
+                        <div class="col-md-4 filter-item project">
+                            <div class="card project-card" onclick="openProject('https://webdashboard-pi.vercel.app/')">
+                                <div class="certificate-card" style="background-image: url('assets/web-dashboard.png');">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 filter-item certificate">
+                            <div class="card project-card" onclick="openProject('https://www.sololearn.com/certificates/CC-LPLODZID')">
+                                <div class="certificate-card" style="background-image: url('assets/certificate-web.png');">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Project Card 2 -->
+                        <div class="col-md-4 filter-item certificate">
+                            <div class="card project-card" onclick="openProject('https://www.sololearn.com/certificates/CC-JRVG3AKI')">
+                                <div class="certificate-card" style="background-image: url('assets/certificate-javascript2.png');">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Project Card 3 -->
+                        <div class="col-md-4 filter-item certificates">
+                            <div class="card project-card" onclick="openProject('https://www.sololearn.com/certificates/CC-XIQVG4NW')">
+                                <div class="certificate-card" style="background-image: url('assets/certificate-html.jpg');">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Project Card 4 -->
+                        <div class="col-md-4 filter-item certificate">
+                            <div class="card project-card" onclick="openProject('https://www.sololearn.com/certificates/CC-WAKXZWMZ')">
+                                <div class="certificate-card" style="background-image: url('assets/certificate-css.jpg');">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Project Card 5 -->
+                        <div class="col-md-4 filter-item certificate">
+                            <div class="card project-card" onclick="openProject('https://www.sololearn.com/certificates/CC-VLIFJFR8')">
+                                <div class="certificate-card" style="background-image: url('assets/certificate-javascript.jpg');">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </header>            
             <!-- About Section-->
             <section class="bg-light py-5">
@@ -527,6 +602,21 @@
                 // Navigasi ke halaman baru menggunakan JavaScript
                 window.location.href = projectUrl;
             }
+
+            function filterGallery(category) {
+                const items = document.querySelectorAll('.filter-item');
+                items.forEach(item => {
+                    if (category === 'all') {
+                        item.style.display = 'block'; // Tampilkan semua item
+                    } else {
+                        // Tampilkan hanya item dengan kategori yang sesuai
+                        item.style.display = item.classList.contains(category) ? 'block' : 'none';
+                    }
+                });
+            }
+        
+            // Tampilkan semua item secara default saat halaman dimuat
+            window.addEventListener('load', () => filterGallery('all'));
         </script>
     </body>
 </html>
